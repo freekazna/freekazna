@@ -128,6 +128,7 @@ _add_formatted_line_to_db(){
 		_ee "Empty line for adding into DB, skipping"
 		return 0
 	fi
+	local arr
 	IFS=';' read -a arr <<< "$1"
 	_add_transaction_to_db "${arr[0]}" "${arr[1]}" "${arr[2]}" "${arr[3]}"
 }
