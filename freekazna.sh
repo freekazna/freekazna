@@ -113,6 +113,10 @@ _add_transaction_to_db(){
 
 # $1: "${md5};${time};${sum};${mcc}"
 _add_formatted_line_to_db(){
+	if [ -z "$1" ]; then
+		_ee "Empty line for adding into DB, skipping"
+		return 0
+	fi
 	IFS=';' read -a arr <<< "$1"
 	_add_transaction_to_db "${arr[0]}" "${arr[1]}" "${arr[2]}" "${arr[3]}"
 }
@@ -156,9 +160,23 @@ _sum2integer__avangard(){
 # Example CSV from Avangard is in test-data/avangard.csv
 # $1: line
 _line2format__avangard(){
+	if [ -z "$1" ]; then
+		_ee "Skipping empty line..."
+		return 0
+	fi
 	local arr
 	# XXX For now iconv is actually not needed because we do not use that field
 	IFS=';' read -a arr <<< "$(echo "$1" | iconv -f cp1251 | sed -e 's,",,g')"
+	# строка-пополнение счета
+	if [ -n "${arr[1]}" ]; then
+		_ee "Skipping line..."
+		return 0
+	fi
+	# оплата по QR СБП, для которой не заполнены столбцы даты, MCC и пр.
+	if [ -z "${arr[4]}" ]; then
+		_ee "Skipping line..."
+		return 0
+	fi
 	local md5
 	local time
 	local sum
