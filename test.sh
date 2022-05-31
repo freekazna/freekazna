@@ -19,4 +19,5 @@ _check_bank_is_supported avangard
 
 test "$(_date2unix__avangard '26.02.2022 20:20')" = 1645896000
 test "$(_sum2integer__avangard '123.45')" = 12345
-test "$(_line2db__avangard "$(head -n 1 test-data/avangard.csv)")" = "5d23fa9895e0ff5af1557d49d5cab1ca;1645896000;14500;5912"
+test "$(_line2format__avangard "$(head -n 1 test-data/avangard.csv)")" = "5d23fa9895e0ff5af1557d49d5cab1ca;1645896000;14500;5912"
+#_file2db__avangard test-data/avangard.csv

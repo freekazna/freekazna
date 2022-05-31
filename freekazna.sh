@@ -14,6 +14,7 @@ _ee(){
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
 XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 FREEKAZNA_DB_DIR="${FREEKAZNA_DB_DIR:-$XDG_DATA_HOME/freekazna}"
+mkdir -p "$FREEKAZNA_DB_DIR"
 FREEKAZNA_DB_TRANSACTIONS="${FREEKAZNA_DB_TRANSACTIONS:-$FREEKAZNA_DB_DIR/transactions.csv}"
 
 # https://github.com/greggles/mcc-codes
@@ -39,7 +40,6 @@ CURRENCY_SIGN="${CURRENCY_SIGN:-₽}"
 # $1: commit message
 _git(){
 	[ -n "${1:-}" ]
-	mkdir -p "$FREEKAZNA_DB_DIR"
 	pushd "$FREEKAZNA_DB_DIR" >/dev/null
 	if ! test -d ".git"; then
 		git init
@@ -97,11 +97,24 @@ _is_transaction_in_db(){
 # $3: sum spent (how much money was spent in your currency)
 # $4: MCC code of the transaction (use "0" if no code)
 _add_transaction_to_db(){
-	if [[ "$*" =~ .*';'.* ]]; then
-		_ee "Error adding transaction into db: symbol ; is used as a delimeter"
-		return 1
+	for i in "$1" "$2" "$3" "$4"
+	do
+		if [[ "$i" =~ .*';'.* ]]; then
+			_ee "Error adding transaction into db: symbol ; is used as a delimeter"
+			return 1
+		fi
+	done
+	if grep -q "^$1;" "$FREEKAZNA_DB_TRANSACTIONS"; then
+		_ee "Line with MD5 $1 already exists in the DB, skipping it"
+		return 0
 	fi
 	echo "${1};${2};${3};${4}" >> "$FREEKAZNA_DB_TRANSACTIONS"
+}
+
+# $1: "${md5};${time};${sum};${mcc}"
+_add_formatted_line_to_db(){
+	IFS=';' read -a arr <<< "$1"
+	_add_transaction_to_db "${arr[0]}" "${arr[1]}" "${arr[2]}" "${arr[3]}"
 }
 
 # $1: date
@@ -142,7 +155,7 @@ _sum2integer__avangard(){
 
 # Example CSV from Avangard is in test-data/avangard.csv
 # $1: line
-_line2db__avangard(){
+_line2format__avangard(){
 	local arr
 	# XXX For now iconv is actually not needed because we do not use that field
 	IFS=';' read -a arr <<< "$(echo "$1" | iconv -f cp1251 | sed -e 's,",,g')"
@@ -155,6 +168,14 @@ _line2db__avangard(){
 	sum="$(_sum2integer__avangard "${arr[2]}")"
 	mcc="${arr[8]}"
 	echo "${md5};${time};${sum};${mcc}"
+}
+
+# $1: path to csv file
+_file2db__avangard(){
+	while read -r line
+	do
+		_add_formatted_line_to_db "$(_line2format__avangard "$line")"
+	done < <(cat "$1")
 }
 
 _main(){
