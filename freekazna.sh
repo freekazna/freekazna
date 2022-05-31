@@ -38,7 +38,7 @@ if [ -z "$FREEKAZNA_MCC_DB" ]; then
 	fi
 fi
 
-# Pull requests and patches with support of CSVs from other banks are welcomed!
+# Pull requests and patches with support of CSVs/JSONs/XMLs/XSLS(X)x/HTMLs/PDFs/etc from other banks are welcomed!
 BANK="${BANK:-avangard}"
 SUPPORTED_BANKS=(avangard raiffeisenrus)
 for i in ${SUPPORTED_BANKS[@]}
