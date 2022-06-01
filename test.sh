@@ -30,3 +30,4 @@ touch "$FREEKAZNA_DB_TRANSACTIONS"
 _file2db__avangard test-data/avangard.csv
 _file2db__raiffeisenrus test-data/raiffeisen-russia.csv
 test "$(cat "$FREEKAZNA_DB_TRANSACTIONS" | _select_by_mcc 5814 | md5sum | awk '{print $1}')" = "f2ed7101fd1fa82aae473f52e0beb1fa"
+test "$(cat "$FREEKAZNA_DB_TRANSACTIONS" | _select_by_date 1653685200 1653771600 | md5sum | awk '{print $1}')" = "00f96575017d6e07a1b51fb481392968"

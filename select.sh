@@ -18,4 +18,22 @@ _select_by_mcc(){
 		fi
 	done
 }
-	
+
+# $1: start date (UNIX timestamp)
+# $2: end date (UNIX timestamp)
+# input into stdin
+_select_by_date(){
+	while read -r line
+	do
+		local arr
+		IFS=';' read -a arr <<< "$line"
+		local date
+		date="${arr[1]}"
+		if [ -z "$date" ]; then
+			return 1
+		fi
+		if (( "$date" >= "$1" )) && (( "$date" <= "$2" )); then
+			echo "$line"
+		fi
+	done
+}
