@@ -16,13 +16,14 @@ XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 FREEKAZNA_DB_DIR="${FREEKAZNA_DB_DIR:-$XDG_DATA_HOME/freekazna}"
 mkdir -p "$FREEKAZNA_DB_DIR"
 FREEKAZNA_DB_TRANSACTIONS="${FREEKAZNA_DB_TRANSACTIONS:-$FREEKAZNA_DB_DIR/transactions.csv}"
+CURRENCY_SIGN="${CURRENCY_SIGN:-₽}"
 
 # if running from directory with code
 if [ -f freekazna.sh ]
 then
-	FREEKAZNA_BANKS_DIR="$PWD/banks"
+	FREEKAZNA_FUNCTIONS_DIR="$PWD"
 else
-	FREEKAZNA_BANKS_DIR="@DATADIR@/freekazna/banks"
+	FREEKAZNA_FUNCTIONS_DIR="@DATADIR@/freekazna"
 fi
 
 # https://github.com/greggles/mcc-codes
@@ -43,10 +44,10 @@ BANK="${BANK:-avangard}"
 SUPPORTED_BANKS=(avangard raiffeisenrus)
 for i in ${SUPPORTED_BANKS[@]}
 do
-	. "$FREEKAZNA_BANKS_DIR"/"$i".sh
+	. "$FREEKAZNA_FUNCTIONS_DIR"/banks/"$i".sh
 done
 
-CURRENCY_SIGN="${CURRENCY_SIGN:-₽}"
+. "$FREEKAZNA_FUNCTIONS_DIR"/select.sh
 		
 # $1: commit message
 _git(){
