@@ -41,7 +41,7 @@ fi
 
 # Pull requests and patches with support of CSVs/JSONs/XMLs/XSLS(X)x/HTMLs/PDFs/etc from other banks are welcomed!
 BANK="${BANK:-avangard}"
-SUPPORTED_BANKS=(avangard raiffeisenrus)
+SUPPORTED_BANKS=(avangard raiffeisenrus tinkoff)
 for i in ${SUPPORTED_BANKS[@]}
 do
 	. "$FREEKAZNA_FUNCTIONS_DIR"/banks/"$i".sh
